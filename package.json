@@ -1,0 +1,25 @@
+{
+  "name": "sample-tweet-analyzer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphene-ai/sample-tweet-analyzer.git"
+  },
+  "author": "Mike del Castillo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/graphene-ai/sample-tweet-analyzer/issues"
+  },
+  "homepage": "https://github.com/graphene-ai/sample-tweet-analyzer#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "graphene-ai": "0.0.1",
+    "twitter": "^1.7.1"
+  }
+}
