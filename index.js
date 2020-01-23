@@ -20,6 +20,7 @@ let maxTrends = 5
 let maxTweets = 20
 
 async function getTrends() {
+    let requestId = Math.floor(Math.random() * 10000)
     try {
         let tempTrends = []
         // Get top trends
@@ -30,17 +31,17 @@ async function getTrends() {
         // Get top 5 trends
         let topTrends = data[0].trends
             .sort((b, a) => a.tweet_volume - b.tweet_volume)
-            .slice(0, 5)
+            .slice(0, maxTrends)
 
         // Create stream for each trend
         for (let trend of topTrends) {
-            console.log(`Getting tweets of trend "${trend.name}"`)
+            console.log(new Date(), `Getting tweets of trend "${trend.name}"`)
             let tweets = await getTweets(trend)
+            console.log(new Date(), `Analyzing tweets of trend "${trend.name}"`)
             for (let tweet of tweets) {
                 // Analyze each tweet under one session
-                let analysis = await analyze(trend, tweet)
+                let analysis = await analyze(requestId, trend, tweet)
                 tweet.analysis = analysis
-                console.log(tweet)
             }
             // Save trend and analyzed tweets
             tempTrends.push({
@@ -50,7 +51,11 @@ async function getTrends() {
         }
 
         trends = tempTrends
-        console.log("Done collecting")
+        console.log(new Date(), "Done collecting")
+
+        // Wait 5 minutes before getting more tweets
+        setInterval(getTrends, 1000 * 60 * 5)
+
     } catch (e) {
         console.warn(e)
         // Try again if it fails
@@ -68,15 +73,27 @@ function getTweets(trend) {
         // Collect only 20 tweets
         stream.on('data', async event => {
             if (event) {
-                tweets.push({
+                // Dont get retweets
+                if(event.text.startsWith("RT")) return
+
+                // Dont get replies
+                if(event.text.match(/\@/gmi)) return
+
+                // Dont get links
+                if(event.text.match(/https/gmi)) return
+
+
+                // Collect tweets
+                tweets.unshift({
                     text: event.text,
                     date: event.created_at,
                 })
+
+                // Collect only a certain number of tweets
                 if (tweets.length == maxTweets) {
                     stream.destroy()
                     resolve(tweets)
                 }
-                console.log(`Got tweet (${tweets.length} of ${maxTweets})`)
             }
         })
 
@@ -85,22 +102,19 @@ function getTweets(trend) {
 }
 
 // No fail Graphene analysis
-async function analyze(trend, tweet) {
+async function analyze(requestId, trend, tweet) {
     try {
-        let analysis = await graphene.analyze(trend.name, tweet.text)
+        let analysis = await graphene.analyze(`${requestId}-${trend.name}`, tweet.text)
         return analysis
     } catch (e) {
         console.warn(e)
         // Try again
-        return await analyze(trend, tweet)
+        return await analyze(requestId, trend, tweet)
     }
 }
 
-// Get trends on start
+// Start trend-getting loop
 getTrends()
-
-// Get new trends every hour
-setInterval(getTrends, 1000 * 60 * 60)
 
 // Start Express server to serve data collected
 const express = require('express')
@@ -109,4 +123,4 @@ const port = 5000
 
 app.get('/', (req, res) => res.json(trends))
 
-app.listen(port, () => console.log(`Demo is running on ${port}!`))
+app.listen(port, () => console.log(new Date(), `Demo is running on ${port}!`))
