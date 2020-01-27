@@ -19,6 +19,8 @@ let trends = []
 let maxTrends = 5
 let maxTweets = 20
 
+const updateTrendsWaitTime = 1000 * 60 * 15
+
 async function getTrends() {
     let requestId = Math.floor(Math.random() * 10000)
     try {
@@ -53,14 +55,12 @@ async function getTrends() {
         trends = tempTrends
         console.log(new Date(), "Done collecting")
 
-        // Wait 5 minutes before getting more tweets
-        setInterval(getTrends, 1000 * 60 * 5)
-
     } catch (e) {
         console.warn(e)
-        // Try again if it fails
-        setTimeout(getTrends, 1000)
     }
+
+    // Wait 5 minutes before getting more tweets
+    setInterval(getTrends, updateTrendsWaitTime)
 }
 
 function getTweets(trend) {
@@ -74,13 +74,13 @@ function getTweets(trend) {
         stream.on('data', async event => {
             if (event) {
                 // Dont get retweets
-                if(event.text.startsWith("RT")) return
+                if (event.text.startsWith("RT")) return
 
                 // Dont get replies
-                if(event.text.match(/\@/gmi)) return
+                if (event.text.match(/\@/gmi)) return
 
                 // Dont get links
-                if(event.text.match(/https/gmi)) return
+                if (event.text.match(/https/gmi)) return
 
 
                 // Collect tweets
