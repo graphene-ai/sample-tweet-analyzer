@@ -97,7 +97,7 @@ function getTweets(trend) {
             }
         })
 
-        stream.on('error', console.warn)
+        stream.on('error', reject)
     })
 }
 
