@@ -42,6 +42,7 @@ async function getTrends() {
             console.log(new Date(), `Analyzing tweets of trend "${trend.name}"`)
             for (let tweet of tweets) {
                 // Analyze each tweet under one session
+                console.log(new Date(), `Analyzing tweet: ${tweet.text}`)
                 let analysis = await analyze(requestId, trend, tweet)
                 tweet.analysis = analysis
             }
@@ -72,7 +73,7 @@ function getTweets(trend) {
 
         // Collect only 20 tweets
         stream.on('data', async event => {
-            if (event) {
+            if (event && event.text) {
                 // Dont get retweets
                 if (event.text.startsWith("RT")) return
 
@@ -88,6 +89,8 @@ function getTweets(trend) {
                     text: event.text,
                     date: event.created_at,
                 })
+
+                console.log(new Date(), `Got tweet: ${event.text}`)
 
                 // Collect only a certain number of tweets
                 if (tweets.length == maxTweets) {
