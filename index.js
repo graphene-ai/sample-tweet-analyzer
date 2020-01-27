@@ -19,7 +19,7 @@ let trends = []
 let maxTrends = 5
 let maxTweets = 20
 
-const updateTrendsWaitTime = 1000 * 60 * 15
+const updateTrendsWaitTime = 1000 * 60 * 7
 
 async function getTrends() {
     let requestId = Math.floor(Math.random() * 10000)
@@ -59,7 +59,7 @@ async function getTrends() {
         console.warn(e)
     }
 
-    // Wait 5 minutes before getting more tweets
+    // Wait a few minutes before getting more tweets
     setInterval(getTrends, updateTrendsWaitTime)
 }
 
