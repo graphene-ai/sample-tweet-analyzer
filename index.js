@@ -97,7 +97,10 @@ function getTweets(trend) {
             }
         })
 
-        stream.on('error', reject)
+        stream.on('error', (error) => {
+            stream.destroy()
+            reject(error)
+        })
     })
 }
 
