@@ -1,6 +1,9 @@
 // Load environment variables
 require('dotenv').config()
 
+// Import packages
+const fs = require('fs')
+
 // Initialize Graphene
 const Graphene = require('graphene-ai')
 const graphene = new Graphene(process.env.GRAPHENE_API_KEY)
@@ -14,13 +17,25 @@ const twitterClient = new Twitter({
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
 })
 
-// Collect tweets from trends
-let trends = []
-let maxTrends = 5
-let maxTweets = 20
-
+// Set app constants
+const maxTrends = 5
+const maxTweets = 20
 const updateTrendsWaitTime = 1000 * 60 * 7
+const dataFile = './data.json'
 
+// Populate trends with local file
+let trends = []
+
+if(fs.existsSync(dataFile)){
+    try{
+        trends = JSON.parse(fs.readFileSync(dataFile, "utf-8"))
+    } catch(e){
+        console.warn(e)
+    }
+}
+
+
+// Collect tweets from trends
 async function getTrends() {
     let requestId = Math.floor(Math.random() * 10000)
     try {
@@ -56,6 +71,8 @@ async function getTrends() {
         trends = tempTrends
         console.log(new Date(), "Done collecting")
 
+        fs.writeFileSync(dataFile, JSON.stringify(trends))
+        console.log(new Date(), "Saving to FS")
     } catch (e) {
         console.warn(e)
     }
