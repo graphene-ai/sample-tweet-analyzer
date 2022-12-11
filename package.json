@@ -18,7 +18,7 @@
   "homepage": "https://github.com/graphene-ai/sample-tweet-analyzer#readme",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "graphene-ai": "0.0.1",
     "twitter": "^1.7.1"
   }
